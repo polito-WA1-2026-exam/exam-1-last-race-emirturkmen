@@ -11,19 +11,27 @@ db.run('PRAGMA foreign_keys = ON', (err) => {
 });
 
 // Read schema.sql file
-const sql = fs.readFileSync('schema.sql', 'utf8');
+const schemaSql = fs.readFileSync('schema.sql', 'utf8');
 
 // Execute sql commands in schema.sql
-db.exec(sql, (err) => {
+db.exec(schemaSql, (err) => {
     if (err) throw err;
     console.log('Schema created');
-
-    const seedSql = fs.readFileSync('seed.sql', 'utf8');
-    db.exec(seedSql, (err) => {
+    // Run seed only if table is empty
+    db.get('SELECT COUNT(*) as count FROM stations', (err, row) => {
         if (err) throw err;
-        console.log("Seed created successfully.");
-    })
+        if (row.count === 0) {
+            const seedSql = fs.readFileSync('seed.sql', 'utf8');
+            db.exec(seedSql, (err) => {
+                if (err) throw err;
+                console.log('Seed created successfully.');
+            });
+        } else {
+            console.log('Database already seeded, skipping.');
+        }
+    });
 });
+
 
 
 export default db;
