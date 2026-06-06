@@ -48,4 +48,21 @@ app.get("/api/network", (req, res) => {
 
     res.json(lines);
   });
-})
+});
+
+app.get("/api/connections", (req, res) => {
+  const sql = `
+    SELECT connections.id,
+           s1.id as station1_id, s1.name as station1_name,
+           s2.id as station2_id, s2.name as station2_name,
+           lines.id as line_id, lines.name as line_name
+    FROM connections
+           JOIN stations s1 ON s1.id = connections.station1_id
+           JOIN stations s2 ON s2.id = connections.station2_id
+           JOIN lines ON lines.id = connections.line_id
+  `;
+  db.all(sql, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows)
+  })
+});
