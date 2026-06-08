@@ -9,17 +9,37 @@
 
 ## API Server
 
-- POST `/api/something`
-  - request parameters and request body content
-  - response body content
-- GET `/api/something`
-  - request parameters
-  - response body content
-- POST `/api/something`
-  - request parameters and request body content
-  - response body content
-- ...
+* GET `/api/network`
+   * Request: none
+   * Response: array of lines with nested stations `[{ id, name, stations: [{id, name}] }]`
 
+* GET `/api/connections`
+   * Request: none
+   * Response: array of segments `[{ id, station1_id, station1_name, station2_id, station2_name, line_id, line_name }]`
+
+* GET `/api/events`
+   * Request: none (requires login)
+   * Response: array of events `[{ id, description, effect }]`
+
+* GET `/api/ranking`
+   * Request: none
+   * Response: array of users with best score `[{ user_id, user_username, user_max_score }]`
+
+* GET `/api/game/new`
+   * Request: none (requires login)
+   * Response: randomly assigned start and destination stations `{ start: id, end: id }`
+
+* POST `/api/sessions`
+   * Request body: `{ username, password }`
+   * Response: logged in user `{ id, username }`
+
+* GET `/api/sessions/current`
+   * Request: none
+   * Response: current user `{ id, username }` or `401` if not authenticated
+
+* DELETE `/api/sessions/current`
+   * Request: none
+   * Response: empty (logout)
 ## Database Tables
 
 - Table `users` - contains xx yy zz
