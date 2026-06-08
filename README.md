@@ -42,9 +42,14 @@
    * Response: empty (logout)
 ## Database Tables
 
-- Table `users` - contains xx yy zz
-- Table `something` - contains ww qq ss
-- ...
+* Table `stations` - contains `id`, `name`
+* Table `lines` - contains `id`, `name`
+* Table `line_stations` - contains `line_id`, `station_id`, `position` (order of station on the line)
+* Table `connections` - contains `id`, `line_id`, `station1_id`, `station2_id`
+* Table `events` - contains `id`, `description`, `effect` (integer from -4 to +4)
+* Table `users` - contains `id`, `username`, `password` (bcrypt hashed)
+* Table `games` - contains `id`, `user_id`, `start_station_id`, `end_station_id`, `score`, `is_valid`, `played_at`
+* Table `game_segments` - contains `id`, `game_id`, `connection_id`, `order_index`
 
 ## Main React Components
 
