@@ -2,7 +2,12 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+
+import session from 'express-session';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
 import db from "./db.js";
+import bcrypt from "bcrypt";
 
 // init express
 const app = express();
@@ -14,6 +19,44 @@ app.use(cors({
   origin: 'http://localhost:5173',  // allow only this origin
   credentials: true                 // necessary for cookies
 }));
+
+// Session middleware
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: false
+}));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy((username, password, done) => {
+  // Find user in DB
+  db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
+    if (err) return done(err);
+    if (!user) return done(null, false, {message: 'User not found'});
+
+    // Check password
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
+      return done(null, user);
+    } else {
+      done(null, false, {message: 'Wrong password'});
+    }
+  });
+}));
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  db.get('SELECT * FROM users WHERE id = ?', [id], (err, user) => {
+    if (err) return done(err);
+    done(null, user);
+  });
+});
 
 // activate the server
 app.listen(port, () => {
@@ -65,4 +108,25 @@ app.get("/api/connections", (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows)
   })
+});
+
+app.post('/api/sessions', passport.authenticate('local'), (req, res) => {
+  // extract password from user
+  const {password, ...userWithoutPassword} = req.user;
+  res.json(userWithoutPassword);
+});
+
+app.delete('/api/sessions/current', (req, res) => {
+  req.logout(() => {
+    res.end();
+  });
+});
+
+app.get('/api/sessions/current', (req, res) => {
+  if (req.isAuthenticated()) {
+    const {password, ...userWithoutPassword} = req.user;
+    res.json(userWithoutPassword);
+  } else {
+    res.status(401).json({ error: 'Not authenticated' });
+  }
 });

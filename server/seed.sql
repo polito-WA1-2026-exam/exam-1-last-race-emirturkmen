@@ -109,9 +109,9 @@ INSERT INTO events (description, effect) VALUES ('Barrier malfunction, paid twic
 -- =====================
 -- USERS (3 username, bcrypt hash - password: "password123")
 -- =====================
-INSERT INTO users (username, password) VALUES ('alice', '$2b$10$rOzGBqjPF5s1QUbKz8Vx5.WKjMkFhL5X6cZ3nNdQqPmWuYvBtS3Hy');
-INSERT INTO users (username, password) VALUES ('bob', '$2b$10$rOzGBqjPF5s1QUbKz8Vx5.WKjMkFhL5X6cZ3nNdQqPmWuYvBtS3Hy');
-INSERT INTO users (username, password) VALUES ('charlie', '$2b$10$rOzGBqjPF5s1QUbKz8Vx5.WKjMkFhL5X6cZ3nNdQqPmWuYvBtS3Hy');
+INSERT INTO users (username, password) VALUES ('alice', '$2b$10$KPRGVDVFgd4NwKRbWUBdPedBLhL/Hx8mIHGhzeU/6h/HdN46uEsJm');
+INSERT INTO users (username, password) VALUES ('bob', '$2b$10$KPRGVDVFgd4NwKRbWUBdPedBLhL/Hx8mIHGhzeU/6h/HdN46uEsJm');
+INSERT INTO users (username, password) VALUES ('charlie', '$2b$10$KPRGVDVFgd4NwKRbWUBdPedBLhL/Hx8mIHGhzeU/6h/HdN46uEsJm');
 
 -- GAMES (alice and bob's games)
 -- =====================
