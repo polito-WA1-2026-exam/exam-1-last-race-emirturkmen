@@ -190,7 +190,27 @@ app.get('/api/game/new', isLoggedIn, (req, res) => {
       res.json({start: randomStartStationId, end: randomDestinationStationId});
     });
   });
-
-
-
 });
+
+app.get('/api/events', isLoggedIn, (req, res) => {
+  db.all('SELECT * FROM events', (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+app.get('/api/ranking', (req, res) => {
+  const sql = `
+    SELECT users.id as user_id, users.username as user_username,
+           MAX(games.score) as user_max_score
+    FROM users
+    JOIN games ON games.user_id = users.id
+    GROUP BY user_id
+    ORDER BY user_max_score DESC
+  `;
+  db.all(sql, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
