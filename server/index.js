@@ -58,6 +58,40 @@ passport.deserializeUser((id, done) => {
   });
 });
 
+const isLoggedIn = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ error: 'Not authenticated' });
+};
+
+function bfs(startId, connections) {
+  const visited = new Set();
+  const queue = [{ id: startId, distance: 0 }];
+  const distances = {};
+
+  while (queue.length > 0) {
+    const { id, distance } = queue.shift();
+
+    if (visited.has(id)) continue;
+    visited.add(id);
+    distances[id] = distance;
+
+    // Find neighbors of this station
+    const neighbors = connections
+        .filter(c => c.station1_id === id || c.station2_id === id)
+        .map(c => c.station1_id === id ? c.station2_id : c.station1_id);
+
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor)) {
+        queue.push({ id: neighbor, distance: distance + 1 });
+      }
+    }
+  }
+
+  return distances; // {istasyon_id: kaç_durak}
+}
+
 // activate the server
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
@@ -106,7 +140,7 @@ app.get("/api/connections", (req, res) => {
   `;
   db.all(sql, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows)
+    res.json(rows);
   })
 });
 
@@ -129,4 +163,34 @@ app.get('/api/sessions/current', (req, res) => {
   } else {
     res.status(401).json({ error: 'Not authenticated' });
   }
+});
+
+// Generate random start and end station
+// Can be used only by logged-in users
+app.get('/api/game/new', isLoggedIn, (req, res) => {
+  let connections = [];
+  let stations = [];
+  // Get all connections
+  db.all('SELECT * FROM connections', (err, conns) => {
+    if (err) return res.status(500).json({ error: err.message });
+    connections = conns;
+    // Get all stations
+    db.all('SELECT * FROM stations', (err, stats) => {
+      if (err) return res.status(500).json({ error: err.message });
+      stations = stats;
+      // Choose a random start station id
+      const randomStartStationId = stations[Math.floor(Math.random() * stations.length)].id;
+      // Calculate all distances to this start station with bfs
+      let distances = bfs(randomStartStationId, connections);
+      // Choose a random end station id among stations with distances >= 3 to start station.
+      const destinationIds = Object.entries(distances)
+          .filter(([id, dist]) => dist >= 3)
+          .map(([id, dist]) => id);
+      const randomDestinationStationId = Number(destinationIds[Math.floor(Math.random() * destinationIds.length)]);
+      res.json({start: randomStartStationId, end: randomDestinationStationId});
+    });
+  });
+
+
+
 });
