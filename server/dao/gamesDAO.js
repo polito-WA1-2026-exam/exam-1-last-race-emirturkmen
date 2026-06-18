@@ -4,8 +4,8 @@ const gamesDAO = {
   createGame: (userId, startId, endId, score, isValid) => {
     return new Promise((resolve, reject) => {
       db.run(
-        'INSERT INTO games (user_id, start_station_id, end_station_id, score, is_valid) VALUES (?, ?, ?, ?, ?)',
-        [userId, startId, endId, score, isValid ? 1 : 0],
+          'INSERT INTO games (user_id, start_station_id, end_station_id, score, is_valid, played_at) VALUES (?, ?, ?, ?, ?, ?)',
+          [userId, startId, endId, score, isValid ? 1 : 0, new Date().toISOString()],
         function (err) {
           if (err) return reject(err);
           resolve(this.lastID);

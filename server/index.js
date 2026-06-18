@@ -167,26 +167,66 @@ app.get('/api/ranking', async (req, res) => {
   }
 });
 
-app.post('/api/games',  async (req, res) => {
+app.post('/api/games',  isLoggedIn,async (req, res) => {
   const { startId, endId, segments } = req.body;
 
-  console.log(segments);
-  if (segments.length === 0 || segments[0] !== startId || segments[segments.length - 1] !== endId) {
-    console.log("score: 0");
-    //return res.json({ score: 0 });
+  // Basic validation for invalid requests
+  if (!startId || !endId || !Array.isArray(segments) || segments.length === 0) {
+    return res.status(400).json({ error: 'Invalid request' });
   }
 
   const connections = await gamesDAO.getConnectionsByIds(segments);
+  const events = await eventsDAO.getEvents();
+  const lineStations = await networkDAO.getLineStations();
+
+  // if first station or end station in user's path does not match with given start,end stations, the route is invalid.
+  if (segments.length === 0 || connections[0].station1_id !== startId ||
+      connections[connections.length-1].station2_id !== endId) {
+    const gameId = await gamesDAO.createGame(req.user.id, startId, endId, 0, false);
+    return res.json({ score: 0, valid: false});
+  }
+
+
+  let score = 20;
+  let chosenEvents = [];
+
 
   for(let i=0; i < connections.length - 1; i++){
-    let curr_conn = connections[i];
-    let next_conn = connections[i+1];
-    if(curr_conn.station2_id != next_conn.station1_id){
-
+    let currConn = connections[i];
+    let nextConn = connections[i+1];
+    // if station 2 of current and station 1 of next does not match, route is not valid
+    if(currConn.station2_id !== nextConn.station1_id){
+      const gameId = await gamesDAO.createGame(req.user.id, startId, endId, 0, false);
+      return res.json({ score: 0, valid: false});
+    }
+    if(currConn.line_id !== nextConn.line_id){
+      const interchangeStation = currConn.station2_id;
+      // is this station in both lines
+      const onLine1 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === currConn.line_id);
+      const onLine2 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === nextConn.line_id);
+      // if this station is not an interchange between two lines, the route is invalid
+      if (!onLine1 || !onLine2) {
+        const gameId = await gamesDAO.createGame(req.user.id, startId, endId, 0, false);
+        return res.json({ score: 0, valid: false });
+      }
     }
 
-
-
+    // Choose a random event for the segment
+    const randomEvent = events[Math.floor(Math.random() * events.length)];
+    chosenEvents.push(randomEvent);
+    score += randomEvent.effect;
   }
-  console.log(connections);
+  // Pick random event for last segment too, as for loop ends with index length(connections) - 1
+  const lastEvent = events[Math.floor(Math.random() * events.length)];
+  chosenEvents.push(lastEvent);
+  score += lastEvent.effect;
+  // if score < 0, it has to be 0 as score cannot be less than zero at the end.
+  score = Math.max(0, score);
+  // save game to db
+  const gameId = await gamesDAO.createGame(req.user.id, startId, endId, score, true);
+  // save chosen segments in game to db
+  for(let i=0; i < segments.length; i++){
+    await gamesDAO.createGameSegment(gameId, segments[i], i);
+  }
+  return res.json({ finalScore: score, valid: true, events: chosenEvents });
 });

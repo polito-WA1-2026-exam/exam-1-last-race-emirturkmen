@@ -55,6 +55,15 @@ const networkDAO = {
       });
     });
   },
+
+  getLineStations: () => {
+    return new Promise((resolve, reject) => {
+      db.all('SELECT * FROM line_stations', (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  },
 };
 
 export default networkDAO;
