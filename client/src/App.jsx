@@ -7,14 +7,17 @@ import RankingPage from './pages/RankingPage'
 
 function App() {
   return (
+      // navbar padding in the top for all pages
       <>
-        <NavigationBar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/play" element={<PlayPage />} />
-          <Route path="/ranking" element={<RankingPage />} />
-        </Routes>
+          <NavigationBar />
+          <div style={{paddingTop: '50px'}}>
+              <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/play" element={<PlayPage />} />
+                  <Route path="/ranking" element={<RankingPage />} />
+              </Routes>
+          </div>
       </>
   )
 }
