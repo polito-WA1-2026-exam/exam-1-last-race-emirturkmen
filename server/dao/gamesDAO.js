@@ -33,7 +33,11 @@ const gamesDAO = {
       const placeholders = segmentIds.map(() => '?').join(', ');
       db.all(`SELECT * FROM connections WHERE id IN (${placeholders})`, segmentIds, (err, rows) => {
         if (err) return reject(err);
-        resolve(rows);
+        // SQLite "IN" rows come back in rowid order, not in the requested order.
+        // Reorder them to match the segmentIds order so the path is preserved.
+        const byId = new Map(rows.map(r => [r.id, r]));
+        const ordered = segmentIds.map(id => byId.get(id));
+        resolve(ordered);
       });
     });
   },
