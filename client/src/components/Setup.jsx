@@ -1,17 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Container, Button, ListGroup } from 'react-bootstrap';
+import { Container, Button } from 'react-bootstrap';
 
 function Setup({ onNext }) {
-    const [network, setNetwork] = useState([])
-
-    useEffect(() => {
-        fetch('http://localhost:3001/api/network', {
-            credentials: 'include'
-        })
-            .then(res => res.json())
-            .then(data => setNetwork(data))
-    }, [])
-
     return (
         <Container className="mt-4" style={{ maxWidth: '700px' }}>
             <h2>Network Map</h2>

@@ -29,17 +29,15 @@ function Planning({ onNext }) {
         return () => clearTimeout(timer)
     }, [timeLeft])
 
-    // Current station (last reached stop): derived by walking from startId through the
+    // Current station (last reached stop): start from startId and walk through the
     // selected segments. Segments are undirected, so at each step we move to the "other end".
     // Because it is derived, undo (removing the last segment) automatically returns to the
     // correct current station with no extra state to keep in sync.
-    const currentStation = gameInfo
-        ? selectedSegments.reduce((station, seg) => {
-            if (seg.station1_id === station) return seg.station2_id
-            if (seg.station2_id === station) return seg.station1_id
-            return station
-        }, gameInfo.start)
-        : null
+    let currentStation = gameInfo ? gameInfo.start : null
+    for (const seg of selectedSegments) {
+        if (seg.station1_id === currentStation) currentStation = seg.station2_id
+        else if (seg.station2_id === currentStation) currentStation = seg.station1_id
+    }
 
     // Resolve a station id to its name using the loaded connections.
     const stationName = (id) => {
@@ -176,12 +174,18 @@ function Planning({ onNext }) {
                             })}
                         </ListGroup>
                     )}
+
+                    {/* Submit lives under the selected route so it is always visible */}
+                    <Button
+                        className="mt-3 w-100"
+                        variant="success"
+                        disabled={selectedSegments.length === 0}
+                        onClick={() => onNext({ gameInfo, segments: selectedSegments })}
+                    >
+                        Submit Route
+                    </Button>
                 </Col>
             </Row>
-
-            <Button className="mt-3 w-100" onClick={() => onNext({ gameInfo, segments: selectedSegments })}>
-                Submit Route
-            </Button>
         </Container>
     )
 }
