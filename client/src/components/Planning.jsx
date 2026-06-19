@@ -75,9 +75,13 @@ function Planning({ onNext }) {
 
     return (
         <Container className="mt-4" style={{ maxWidth: '900px' }}>
-            <div className="d-flex justify-content-between mb-3">
-                <h2>Plan Your Route</h2>
-                <Badge bg={timeLeft < 20 ? 'danger' : 'primary'} style={{ fontSize: '1.2rem' }}>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2 className="mb-0">Plan Your Route</h2>
+                <Badge
+                    bg={timeLeft < 20 ? 'danger' : 'primary'}
+                    className="d-flex align-items-center"
+                    style={{ fontSize: '1.2rem', padding: '0.5rem 0.75rem' }}
+                >
                     {timeLeft}s
                 </Badge>
             </div>

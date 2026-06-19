@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Container, Table } from 'react-bootstrap';
+import { Container, Table, Alert, Button } from 'react-bootstrap';
+import { Link, useLocation } from 'react-router-dom';
 
 function RankingPage() {
     const [ranking, setRanking] = useState([])  // ranking list
+    const location = useLocation()
+    // Score of the game the user just finished, passed when navigating here from Execution.
+    const lastScore = location.state?.lastScore
 
     useEffect(() => {
         // runs when the page is mounted
@@ -15,7 +19,15 @@ function RankingPage() {
 
     return (
         <Container className="mt-4">
-            <h2>Ranking</h2>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+                <h2 className="mb-0">Ranking</h2>
+                <Button as={Link} to="/play">Play Again</Button>
+            </div>
+            {lastScore !== undefined && (
+                <Alert variant={lastScore > 0 ? 'success' : 'danger'}>
+                    Your last game scored <strong>{lastScore} coins</strong>.
+                </Alert>
+            )}
             <Table striped bordered>
                 <thead>
                 <tr>
