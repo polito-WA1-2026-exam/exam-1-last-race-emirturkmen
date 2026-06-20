@@ -23,9 +23,9 @@ function NavigationBar() {
                 <Nav className="me-auto">
                     {/* NavLink adds an "active" class automatically for the current route */}
                     <Nav.Link as={NavLink} to="/" end>Home</Nav.Link>
-                    {/* Play link only when the user is logged in */}
+                    {/* Play and Ranking links only when the user is logged in */}
                     {user && <Nav.Link as={NavLink} to="/play">Play</Nav.Link>}
-                    <Nav.Link as={NavLink} to="/ranking">Ranking</Nav.Link>
+                    {user && <Nav.Link as={NavLink} to="/ranking">Ranking</Nav.Link>}
                 </Nav>
                 <Nav>
                     {user ? (

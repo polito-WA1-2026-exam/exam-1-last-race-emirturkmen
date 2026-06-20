@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Container, Button, ListGroup, Badge, Alert, Form, Row, Col, ProgressBar } from 'react-bootstrap'
+import { Container, Button, ListGroup, Badge, Alert, Form, Row, Col, ProgressBar, Card } from 'react-bootstrap'
 
 function Planning({ onNext }) {
     const [connections, setConnections] = useState([])
@@ -73,7 +73,7 @@ function Planning({ onNext }) {
     }
 
     return (
-        <Container className="mt-4" style={{ maxWidth: '900px' }}>
+        <Container className="mt-4" style={{ maxWidth: '1250px' }}>
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h2 className="mb-0">Plan Your Route</h2>
                 <Badge
@@ -110,8 +110,19 @@ function Planning({ onNext }) {
             )}
 
             <Row>
-                {/* Left: list of all segments */}
-                <Col md={6}>
+                {/* Left: station map for reference while planning */}
+                <Col md={5}>
+                    <Card>
+                        <Card.Header>Station Map</Card.Header>
+                        <Card.Body className="text-center">
+                            <img src="/metro_map_wo_stations.png" alt="Station Map"
+                                style={{ maxWidth: '100%', display: 'block', margin: '0 auto' }} />
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                {/* Middle: list of all segments */}
+                <Col md={4}>
                     <h5>All Segments</h5>
                     {/* Legend so the user can tell selectable vs unreachable at a glance */}
                     <div className="d-flex gap-3 mb-2 small text-muted">
@@ -152,7 +163,7 @@ function Planning({ onNext }) {
                 </Col>
 
                 {/* Right: selected segments */}
-                <Col md={6}>
+                <Col md={3}>
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <h5 className="mb-0">Your Route <Badge bg="secondary">{selectedSegments.length}</Badge></h5>
                         <Button

@@ -8,7 +8,19 @@ function HomePage() {
 
     return (
         <Container className="mt-4" style={{ maxWidth: '700px' }}>
-            <h1 className="mb-4">Last Race</h1>
+            {/* Title on the left, play/login action on the right */}
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h1 className="mb-0">Last Race</h1>
+                {user ? (
+                    <Button size="lg" onClick={() => navigate('/play')}>
+                        Play Now ▶️
+                    </Button>
+                ) : (
+                    <Button size="lg" variant="outline-primary" onClick={() => navigate('/login')}>
+                        Login to Play
+                    </Button>
+                )}
+            </div>
 
             <Card className="mb-3">
                 <Card.Body>
@@ -45,15 +57,6 @@ function HomePage() {
                 </Card.Body>
             </Card>
 
-            {user ? (
-                <Button size="lg" onClick={() => navigate('/play')}>
-                    Play Now ▶️
-                </Button>
-            ) : (
-                <Button size="lg" variant="outline-primary" onClick={() => navigate('/login')}>
-                    Login to Play
-                </Button>
-            )}
         </Container>
     )
 }

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Container, Table, Alert, Button } from 'react-bootstrap';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function RankingPage() {
     const [ranking, setRanking] = useState([])  // ranking list
     const location = useLocation()
-    const { user } = useAuth()
+    const { user, loading } = useAuth()
     // Score of the game the user just finished, passed when navigating here from Execution.
     const lastScore = location.state?.lastScore
 
@@ -21,6 +21,13 @@ function RankingPage() {
 
     // Medal for the top three players, plain position number for the rest.
     const medal = (index) => ['🥇', '🥈', '🥉'][index] || index + 1
+
+    // Wait for the session check, then block guests (same guard as /play)
+    if (loading)
+        return null
+
+    if (!user)
+        return <Navigate to="/login" />
 
     return (
         <Container className="mt-4">
