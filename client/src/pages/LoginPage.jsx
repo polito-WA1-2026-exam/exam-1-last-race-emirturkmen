@@ -10,7 +10,8 @@ function LoginPage() {
     const { login } = useAuth()
     const navigate = useNavigate()
 
-    const submit = async () => {
+    const submit = async (event) => {
+        event.preventDefault();  // stop the browser from reloading the page on submit
         const response = await fetch("http://localhost:3001/api/sessions", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -22,14 +23,10 @@ function LoginPage() {
             const data = await response.json()  // {id, username}
             login(data)
             navigate('/')
-        }
-        else{
+        } else {
             setError("Invalid username or password");
         }
     };
-
-
-
 
     return (
         <Container className="mt-5" style={{maxWidth: '400px'}}>
@@ -37,23 +34,32 @@ function LoginPage() {
 
             {error && <Alert variant="danger">{error}</Alert>}
 
-            <Form.Control
-                className="mb-3"
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-            />
+            {/* Wrapping inputs in a Form lets the user submit by pressing Enter */}
+            <Form onSubmit={submit}>
+                <Form.Group className="mb-3">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Enter username"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                    />
+                </Form.Group>
 
-            <Form.Control
-                className="mb-3"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-            />
+                <Form.Group className="mb-3">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                        type="password"
+                        placeholder="Enter password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                    />
+                </Form.Group>
 
-            <Button className="w-100" onClick={submit}>Login</Button>
+                <Button className="w-100" type="submit" disabled={!username || !password}>
+                    Login
+                </Button>
+            </Form>
         </Container>
     );
 }

@@ -47,7 +47,7 @@ function HomePage() {
 
             {user ? (
                 <Button size="lg" onClick={() => navigate('/play')}>
-                    Play Now
+                    Play Now ▶️
                 </Button>
             ) : (
                 <Button size="lg" variant="outline-primary" onClick={() => navigate('/login')}>

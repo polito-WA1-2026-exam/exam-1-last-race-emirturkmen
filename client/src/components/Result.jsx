@@ -10,13 +10,13 @@ function Result({ result, gameInfo, onRestart }) {
 
     const actions = (
         <div className="d-flex gap-3 justify-content-center">
-            <Button variant="primary" size="lg" onClick={onRestart}>Play Again</Button>
+            <Button variant="primary" size="lg" onClick={onRestart}>Play Again 🔄</Button>
             <Button
                 variant="outline-secondary"
                 size="lg"
                 onClick={() => navigate('/ranking', { state: { lastScore: score } })}
             >
-                View Ranking
+                View Ranking 🏆
             </Button>
         </div>
     )

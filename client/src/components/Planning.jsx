@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Container, Button, ListGroup, Badge, Alert, Form, Row, Col } from 'react-bootstrap'
+import { Container, Button, ListGroup, Badge, Alert, Form, Row, Col, ProgressBar } from 'react-bootstrap'
 
 function Planning({ onNext }) {
     const [connections, setConnections] = useState([])
@@ -17,7 +17,8 @@ function Planning({ onNext }) {
     useEffect(() => {
         fetch('http://localhost:3001/api/connections', { credentials: 'include' })
             .then(res => res.json())
-            .then(data => setConnections(data))
+            // shuffle once so the segments are not shown in a predictable order
+            .then(data => setConnections(data.sort(() => Math.random() - 0.5)))
     }, [])
 
     useEffect(() => {
@@ -84,6 +85,14 @@ function Planning({ onNext }) {
                 </Badge>
             </div>
 
+            {/* Countdown bar mirroring the timer, turns red in the last 20 seconds */}
+            <ProgressBar
+                now={timeLeft}
+                max={90}
+                variant={timeLeft < 20 ? 'danger' : 'primary'}
+                className="mb-3"
+            />
+
             {gameInfo && (
                 <Alert variant="info">
                     From: <strong>{gameInfo.startName}</strong> → To: <strong>{gameInfo.endName}</strong>
@@ -93,6 +102,11 @@ function Planning({ onNext }) {
                         </div>
                     )}
                 </Alert>
+            )}
+
+            {/* Tell the user when the route already reaches the destination */}
+            {gameInfo && currentStation === gameInfo.end && (
+                <Alert variant="success">✓ Destination reached! You can submit your route.</Alert>
             )}
 
             <Row>
@@ -140,7 +154,7 @@ function Planning({ onNext }) {
                 {/* Right: selected segments */}
                 <Col md={6}>
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h5 className="mb-0">Your Route</h5>
+                        <h5 className="mb-0">Your Route <Badge bg="secondary">{selectedSegments.length}</Badge></h5>
                         <Button
                             size="sm"
                             variant="outline-danger"

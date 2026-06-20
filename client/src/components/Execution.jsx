@@ -64,7 +64,7 @@ function Execution({ gameData, onFinish }) {
                 <Badge
                     bg={displayScore > 20 ? 'success' : displayScore > 0 ? 'warning' : 'danger'}
                     text={displayScore > 0 && displayScore <= 20 ? 'dark' : undefined}
-                    style={{ fontSize: '1.1rem', padding: '0.5rem 0.8rem' }}
+                    style={{ fontSize: '1.1rem', padding: '0.5rem 0.8rem', transition: 'all 0.3s ease' }}
                 >
                     {displayScore} coins
                 </Badge>
@@ -84,7 +84,7 @@ function Execution({ gameData, onFinish }) {
             ) : (
                 <ListGroup className="mb-3">
                     {result.events.slice(0, stepsRevealed).map((event, index) => (
-                        <ListGroup.Item key={index}>
+                        <ListGroup.Item key={index} variant={event.effect >= 0 ? 'success' : 'danger'}>
                             <div className="d-flex justify-content-between align-items-start">
                                 <div>
                                     <div className="fw-semibold">{segmentLabels[index]}</div>
