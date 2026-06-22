@@ -51,12 +51,3 @@ CREATE TABLE IF NOT EXISTS games (
     FOREIGN KEY (end_station_id) REFERENCES stations(id)
     );
 
-CREATE TABLE IF NOT EXISTS game_segments (
-                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                             game_id INTEGER NOT NULL,
-                                             segment_id INTEGER NOT NULL,
-                                             order_index INTEGER NOT NULL,
-                                             FOREIGN KEY (game_id) REFERENCES games(id),
-    FOREIGN KEY (segment_id) REFERENCES segments(id)
-    );
-

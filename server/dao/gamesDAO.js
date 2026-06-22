@@ -14,19 +14,6 @@ const gamesDAO = {
     });
   },
 
-  createGameSegment: (gameId, segmentId, orderIndex) => {
-    return new Promise((resolve, reject) => {
-      db.run(
-        'INSERT INTO game_segments (game_id, segment_id, order_index) VALUES (?, ?, ?)',
-        [gameId, segmentId, orderIndex],
-        function (err) {
-          if (err) return reject(err);
-          resolve(this.lastID);
-        }
-      );
-    });
-  },
-
   getSegmentsByIds: (segmentIds) => {
     return new Promise((resolve, reject) => {
       if (segmentIds.length === 0) return resolve([]);

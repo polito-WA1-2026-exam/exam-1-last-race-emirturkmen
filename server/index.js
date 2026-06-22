@@ -235,10 +235,6 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
 
     // save game to db
     const gameId = await gamesDAO.createGame(req.user.id, startId, endId, score, true);
-    // save chosen segments in game to db
-    for (let i = 0; i < segments.length; i++) {
-      await gamesDAO.createGameSegment(gameId, segments[i], i);
-    }
     return res.json({ finalScore: score, valid: true, events: chosenEvents });
   } catch (err) {
     res.status(500).json({ error: err.message });

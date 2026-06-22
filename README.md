@@ -49,7 +49,6 @@
 * Table `events` - contains `id`, `description`, `effect` (integer from -4 to +4)
 * Table `users` - contains `id`, `username`, `password` (bcrypt hashed)
 * Table `games` - contains `id`, `user_id`, `start_station_id`, `end_station_id`, `score`, `is_valid`, `played_at`
-* Table `game_segments` - contains `id`, `game_id`, `segment_id`, `order_index`
 
 ## Main React Components
 
