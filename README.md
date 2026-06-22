@@ -96,5 +96,6 @@
 - charlie, password123
 
 ## Use of AI Tools
-Briefly describe whether you used any AI tools (e.g., ChatGPT, GitHub Copilot, Claude) while working on this project, for which purposes (e.g., clarifying concepts, debugging, generating code), and how you verified or adapted their output.
-If you did not use any AI tools, simply state so.
+I used Claude and Gemini as development assistants for this project. I initially used Claude to generate boilerplate code. After that, I used both tools to discuss design decisions and make sure the project met all the requirements. I also used Gemini specifically to help design the metro map layout, while Claude helped me brainstorm potential edge cases and negative test scenarios for debugging.
+
+Most importantly, all AI-generated suggestions were carefully reviewed. No code or concept was added to the project until I fully analyzed it, verified it, and made sure it worked correctly and safely within the system.
