@@ -64,8 +64,6 @@
 - `RankingPage` (in `pages/RankingPage.jsx`): leaderboard with medals for the top three and the logged-in user's row highlighted.
 - `AuthContext` (in `context/AuthContext.jsx`): holds the logged-in user and restores the session from the server on page load.
 
-(only _main_ components, minor ones may be skipped)
-
 ## Screenshots
 
 ### Home (anonymous visitor)
