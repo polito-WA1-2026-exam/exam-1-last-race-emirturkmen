@@ -1,0 +1,16 @@
+# OS files
+.DS_Store
+Desktop.ini
+Thumbs.db
+
+# IDE / editor
+.idea/
+.vscode/
+
+# API testing tools
+.postman/
+postman/
+server/cookies.txt
+
+# SQLite database (regenerated from schema.sql + seed.sql on first run)
+*.sqlite
