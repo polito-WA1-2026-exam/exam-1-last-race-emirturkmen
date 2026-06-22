@@ -182,6 +182,12 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
       return markInvalid();
     }
 
+    // No segment can be used more than once in the route
+    const uniqueSegments = new Set(segments);
+    if (uniqueSegments.size !== segments.length) {
+      return markInvalid();
+    }
+
     // every requested segment id must resolve to a real segment
     if (routeSegments.some(s => !s)) {
       return markInvalid();

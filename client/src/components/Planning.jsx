@@ -1,22 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Container, Button, ListGroup, Badge, Alert, Form, Row, Col, ProgressBar, Card } from 'react-bootstrap'
 
 function Planning({ onNext, gameInfo, gameInfoError, segments }) {
     const [selectedSegments, setSelectedSegments] = useState([])
     const [timeLeft, setTimeLeft] = useState(90)
     const [search, setSearch] = useState('')
-    const [error, setError] = useState(false)
+    const error = gameInfoError
 
     // Submit the route built so far. Shared by the "Submit Route" button and by the
     // timeout below, so running out of time behaves exactly like pressing Submit.
     // The server then decides: a complete valid route is scored, otherwise it is invalid.
-    const submitRoute = () => onNext({ gameInfo, segments: selectedSegments })
-
-    useEffect(() => {
-        if (gameInfoError) {
-            setError(true)
-        }
-    }, [gameInfoError])
+    const submitRoute = useCallback(() => onNext({ gameInfo, segments: selectedSegments }), [onNext, gameInfo, selectedSegments])
 
     // Count down one second at a time until the timer reaches 0
     useEffect(() => {
@@ -27,7 +21,7 @@ function Planning({ onNext, gameInfo, gameInfoError, segments }) {
     // When the time is up, auto-submit the current route (as if Submit was pressed)
     useEffect(() => {
         if (timeLeft === 0) submitRoute()
-    }, [timeLeft])
+    }, [timeLeft, submitRoute])
 
     // Current station (last reached stop): start from startId and walk through the
     // selected segments. Segments are undirected, so at each step we move to the "other end".
@@ -68,6 +62,12 @@ function Planning({ onNext, gameInfo, gameInfoError, segments }) {
     // are reachable. The last selected segment also touches current, so it stays clickable to undo.
     const isDisabled = (segment) => {
         if (currentStation === null) return true
+        const isSelected = selectedSegments.some(s => s.id === segment.id)
+        if (isSelected) {
+            // An already selected segment can only be toggled (undone) if it is the last one in the route
+            const lastSelected = selectedSegments[selectedSegments.length - 1]
+            return lastSelected.id !== segment.id
+        }
         return segment.station1_id !== currentStation && segment.station2_id !== currentStation
     }
 

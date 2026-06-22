@@ -1,16 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Container, Button, ListGroup, Badge, ProgressBar, Alert } from 'react-bootstrap';
 
 function Execution({ gameData, gameResult, executionError, onFinish }) {
     const [revealed, setRevealed] = useState(0)   // how many segments have been revealed so far
-    const [error, setError] = useState(false)
     const result = gameResult
-
-    useEffect(() => {
-        if (executionError) {
-            setError(true)
-        }
-    }, [executionError])
+    const error = executionError
 
     if (error) return (
         <Container className="mt-4" style={{ maxWidth: '700px' }}>
