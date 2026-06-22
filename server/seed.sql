@@ -63,35 +63,35 @@ INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 14, 4);
 INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 17, 5);
 INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 18, 6);
 
--- CONNECTIONS (komşu çiftler, her hat için)
+-- SEGMENTS (komşu çiftler, her hat için)
 
 -- Ligne 1
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (1, 1, 2);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (1, 2, 3);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (1, 3, 4);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (1, 4, 5);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (1, 5, 6);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (1, 1, 2);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (1, 2, 3);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (1, 3, 4);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (1, 4, 5);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (1, 5, 6);
 
 -- Ligne 2
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (2, 7, 8);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (2, 8, 9);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (2, 9, 4);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (2, 4, 10);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (2, 10, 11);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (2, 7, 8);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (2, 8, 9);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (2, 9, 4);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (2, 4, 10);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (2, 10, 11);
 
 -- Ligne 3
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (3, 2, 12);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (3, 12, 10);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (3, 10, 13);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (3, 13, 14);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (3, 14, 15);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (3, 2, 12);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (3, 12, 10);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (3, 10, 13);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (3, 13, 14);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (3, 14, 15);
 
 -- Ligne 4
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (4, 16, 3);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (4, 3, 4);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (4, 4, 14);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (4, 14, 17);
-INSERT INTO connections (line_id, station1_id, station2_id) VALUES (4, 17, 18);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 16, 3);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 3, 4);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 4, 14);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 14, 17);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 17, 18);
 
 
 -- EVENTS (8 different events)

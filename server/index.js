@@ -60,7 +60,7 @@ const isLoggedIn = (req, res, next) => {
   res.status(401).json({ error: 'Not authenticated' });
 };
 
-function bfs(startId, connections) {
+function bfs(startId, segments) {
   const visited = new Set();
   const queue = [{ id: startId, distance: 0 }];
   const distances = {};
@@ -72,7 +72,7 @@ function bfs(startId, connections) {
     distances[id] = distance;
 
     // Find neighbors of this station
-    const neighbors = connections
+    const neighbors = segments
         .filter(c => c.station1_id === id || c.station2_id === id)
         .map(c => c.station1_id === id ? c.station2_id : c.station1_id);
 
@@ -90,10 +90,10 @@ app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
-app.get('/api/connections', isLoggedIn, async (req, res) => {
+app.get('/api/segments', isLoggedIn, async (req, res) => {
   try {
-    const connections = await networkDAO.getConnections();
-    res.json(connections);
+    const segments = await networkDAO.getSegments();
+    res.json(segments);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -121,13 +121,13 @@ app.get('/api/sessions/current', (req, res) => {
 // Can be used only by logged-in users
 app.get('/api/game/new', isLoggedIn, async (req, res) => {
   try {
-    const [connections, stations] = await Promise.all([
-      networkDAO.getConnections(),
+    const [segments, stations] = await Promise.all([
+      networkDAO.getSegments(),
       networkDAO.getStations(),
     ]);
 
     const randomStartStationId = stations[Math.floor(Math.random() * stations.length)].id;
-    const distances = bfs(randomStartStationId, connections);
+    const distances = bfs(randomStartStationId, segments);
 
     const destinationIds = Object.entries(distances)
       .filter(([, dist]) => dist >= 3)
@@ -167,7 +167,7 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
   }
 
   try {
-    const connections = await gamesDAO.getConnectionsByIds(segments);
+    const routeSegments = await gamesDAO.getSegmentsByIds(segments);
     const events = await eventsDAO.getEvents();
     const lineStations = await networkDAO.getLineStations();
 
@@ -177,22 +177,22 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
       return res.json({ score: 0, valid: false });
     };
 
-    // every requested segment id must resolve to a real connection
-    if (connections.some(c => !c)) {
+    // every requested segment id must resolve to a real segment
+    if (routeSegments.some(s => !s)) {
       return markInvalid();
     }
 
-    // Connections are undirected: a segment links station1_id and station2_id in either direction.
+    // Segments are undirected: each one links station1_id and station2_id in either direction.
     // We walk the path starting from startId; at each step the segment must touch the current
     // station, and we move to its other endpoint. "exits" keeps the station we leave each segment at.
     let current = startId;
     const exits = [];
-    for (const conn of connections) {
+    for (const seg of routeSegments) {
       let next;
-      if (conn.station1_id === current) {
-        next = conn.station2_id;
-      } else if (conn.station2_id === current) {
-        next = conn.station1_id;
+      if (seg.station1_id === current) {
+        next = seg.station2_id;
+      } else if (seg.station2_id === current) {
+        next = seg.station1_id;
       } else {
         // this segment is not connected to where we currently are -> broken path
         return markInvalid();
@@ -208,14 +208,14 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
 
     // when two consecutive segments are on different lines, the station between them
     // (the shared station) must be an interchange that belongs to both lines.
-    for (let i = 0; i < connections.length - 1; i++) {
-      const currConn = connections[i];
-      const nextConn = connections[i + 1];
-      if (currConn.line_id !== nextConn.line_id) {
-        // shared station = endpoint of currConn we arrived at = entry point of nextConn
+    for (let i = 0; i < routeSegments.length - 1; i++) {
+      const currSeg = routeSegments[i];
+      const nextSeg = routeSegments[i + 1];
+      if (currSeg.line_id !== nextSeg.line_id) {
+        // shared station = endpoint of currSeg we arrived at = entry point of nextSeg
         const interchangeStation = exits[i + 1];
-        const onLine1 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === currConn.line_id);
-        const onLine2 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === nextConn.line_id);
+        const onLine1 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === currSeg.line_id);
+        const onLine2 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === nextSeg.line_id);
         if (!onLine1 || !onLine2) {
           return markInvalid();
         }
@@ -225,7 +225,7 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
     // route is valid -> compute score with one random event per segment
     let score = 20;
     const chosenEvents = [];
-    for (let i = 0; i < connections.length; i++) {
+    for (let i = 0; i < routeSegments.length; i++) {
       const randomEvent = events[Math.floor(Math.random() * events.length)];
       chosenEvents.push(randomEvent);
       score += randomEvent.effect;

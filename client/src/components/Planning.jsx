@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Container, Button, ListGroup, Badge, Alert, Form, Row, Col, ProgressBar, Card } from 'react-bootstrap'
 
 function Planning({ onNext }) {
-    const [connections, setConnections] = useState([])
+    const [segments, setSegments] = useState([])
     const [gameInfo, setGameInfo] = useState(null)
     const [selectedSegments, setSelectedSegments] = useState([])
     const [timeLeft, setTimeLeft] = useState(90)
@@ -22,10 +22,10 @@ function Planning({ onNext }) {
     }, [])
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/connections', { credentials: 'include' })
+        fetch('http://localhost:3001/api/segments', { credentials: 'include' })
             .then(res => res.json())
             // shuffle once so the segments are not shown in a predictable order
-            .then(data => setConnections(data.sort(() => Math.random() - 0.5)))
+            .then(data => setSegments(data.sort(() => Math.random() - 0.5)))
             .catch(() => setError(true))
     }, [])
 
@@ -50,36 +50,36 @@ function Planning({ onNext }) {
         else if (seg.station2_id === currentStation) currentStation = seg.station1_id
     }
 
-    // Resolve a station id to its name using the loaded connections.
+    // Resolve a station id to its name using the loaded segments.
     const stationName = (id) => {
-        for (const c of connections) {
-            if (c.station1_id === id) return c.station1_name
-            if (c.station2_id === id) return c.station2_name
+        for (const s of segments) {
+            if (s.station1_id === id) return s.station1_name
+            if (s.station2_id === id) return s.station2_name
         }
         return id
     }
 
-    const toggleSegment = (connection) => {
+    const toggleSegment = (segment) => {
         setSelectedSegments(prev => {
-            const exists = prev.find(s => s.id === connection.id)
-            if (exists) return prev.filter(s => s.id !== connection.id)
-            return [...prev, connection]
+            const exists = prev.find(s => s.id === segment.id)
+            if (exists) return prev.filter(s => s.id !== segment.id)
+            return [...prev, segment]
         })
     }
 
     // Clear the whole route so the user can start over.
     const resetRoute = () => setSelectedSegments([])
 
-    const filteredConnections = connections.filter(conn =>
-        conn.station1_name.toLowerCase().includes(search.toLowerCase()) ||
-        conn.station2_name.toLowerCase().includes(search.toLowerCase())
+    const filteredSegments = segments.filter(seg =>
+        seg.station1_name.toLowerCase().includes(search.toLowerCase()) ||
+        seg.station2_name.toLowerCase().includes(search.toLowerCase())
     )
 
-    // Only connections attached to the current station (one of their two ends equals current)
+    // Only segments attached to the current station (one of their two ends equals current)
     // are reachable. The last selected segment also touches current, so it stays clickable to undo.
-    const isDisabled = (connection) => {
+    const isDisabled = (segment) => {
         if (currentStation === null) return true
-        return connection.station1_id !== currentStation && connection.station2_id !== currentStation
+        return segment.station1_id !== currentStation && segment.station2_id !== currentStation
     }
 
     return (
@@ -148,23 +148,23 @@ function Planning({ onNext }) {
                         onChange={e => setSearch(e.target.value)}
                     />
                     <ListGroup style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                        {filteredConnections.map(conn => {
-                            const selected = selectedSegments.some(s => s.id === conn.id)
-                            const disabled = isDisabled(conn)
+                        {filteredSegments.map(seg => {
+                            const selected = selectedSegments.some(s => s.id === seg.id)
+                            const disabled = isDisabled(seg)
                             // Selectable = reachable from current station and not already in the route.
                             const selectable = !disabled && !selected
                             return (
                                 <ListGroup.Item
-                                    key={conn.id}
+                                    key={seg.id}
                                     action
                                     active={selected}
-                                    onClick={() => toggleSegment(conn)}
+                                    onClick={() => toggleSegment(seg)}
                                     disabled={disabled}
                                     variant={selectable ? 'success' : undefined}
                                     className="d-flex justify-content-between align-items-center"
                                     style={{ opacity: disabled && !selected ? 0.55 : 1 }}
                                 >
-                                    <span>{conn.station1_name} — {conn.station2_name}</span>
+                                    <span>{seg.station1_name} — {seg.station2_name}</span>
                                     {selectable && <Badge bg="success">Select →</Badge>}
                                     {selected && <Badge bg="light" text="dark">In route</Badge>}
                                 </ListGroup.Item>

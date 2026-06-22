@@ -14,11 +14,11 @@ const gamesDAO = {
     });
   },
 
-  createGameSegment: (gameId, connectionId, orderIndex) => {
+  createGameSegment: (gameId, segmentId, orderIndex) => {
     return new Promise((resolve, reject) => {
       db.run(
-        'INSERT INTO game_segments (game_id, connection_id, order_index) VALUES (?, ?, ?)',
-        [gameId, connectionId, orderIndex],
+        'INSERT INTO game_segments (game_id, segment_id, order_index) VALUES (?, ?, ?)',
+        [gameId, segmentId, orderIndex],
         function (err) {
           if (err) return reject(err);
           resolve(this.lastID);
@@ -27,11 +27,11 @@ const gamesDAO = {
     });
   },
 
-  getConnectionsByIds: (segmentIds) => {
+  getSegmentsByIds: (segmentIds) => {
     return new Promise((resolve, reject) => {
       if (segmentIds.length === 0) return resolve([]);
       const placeholders = segmentIds.map(() => '?').join(', ');
-      db.all(`SELECT * FROM connections WHERE id IN (${placeholders})`, segmentIds, (err, rows) => {
+      db.all(`SELECT * FROM segments WHERE id IN (${placeholders})`, segmentIds, (err, rows) => {
         if (err) return reject(err);
         // SQLite "IN" rows come back in rowid order, not in the requested order.
         // Reorder them to match the segmentIds order so the path is preserved.

@@ -10,7 +10,7 @@
 
 ## API Server
 
-* GET `/api/connections`
+* GET `/api/segments`
    * Request: none (requires login)
    * Response: array of segments `[{ id, station1_id, station1_name, station2_id, station2_name, line_id, line_name }]`
 
@@ -19,7 +19,7 @@
    * Response: randomly assigned start and destination stations (the destination is at least 3 stops away) `{ start: id, startName, end: id, endName }`
 
 * POST `/api/games`
-   * Request body: `{ startId, endId, segments: [connectionId, ...] }` (the ordered list of selected connection ids; requires login)
+   * Request body: `{ startId, endId, segments: [segmentId, ...] }` (the ordered list of selected segment ids; requires login)
    * Response (valid route): `{ valid: true, finalScore, events: [{ id, description, effect }, ...] }`
    * Response (invalid route): `{ valid: false, score: 0 }`
    * The route is validated server-side: segments are undirected, must form a continuous path from `startId` to `endId`, and line changes are only allowed at interchange stations. The game (and its segments) is saved to the database in both cases.
@@ -45,11 +45,11 @@
 * Table `stations` - contains `id`, `name`
 * Table `lines` - contains `id`, `name`
 * Table `line_stations` - contains `line_id`, `station_id`, `position` (order of station on the line)
-* Table `connections` - contains `id`, `line_id`, `station1_id`, `station2_id` (an undirected segment between two stations on a line)
+* Table `segments` - contains `id`, `line_id`, `station1_id`, `station2_id` (an undirected segment between two stations on a line)
 * Table `events` - contains `id`, `description`, `effect` (integer from -4 to +4)
 * Table `users` - contains `id`, `username`, `password` (bcrypt hashed)
 * Table `games` - contains `id`, `user_id`, `start_station_id`, `end_station_id`, `score`, `is_valid`, `played_at`
-* Table `game_segments` - contains `id`, `game_id`, `connection_id`, `order_index`
+* Table `game_segments` - contains `id`, `game_id`, `segment_id`, `order_index`
 
 ## Main React Components
 
@@ -66,9 +66,31 @@
 
 (only _main_ components, minor ones may be skipped)
 
-## Screenshot
+## Screenshots
 
-![Screenshot](./img/screenshot.jpg)
+### Home (anonymous visitor)
+![Home anonymous](./img/home_anon.png)
+
+### Login
+![Login](./img/login_page.png)
+
+### Home (logged-in user)
+![Home logged in](./img/home_loggedin.png)
+
+### Setup — full network map
+![Setup](./img/setup.png)
+
+### Planning — build the route (90s)
+![Planning](./img/planning.png)
+
+### Execution — step-by-step journey
+![Execution](./img/execution.png)
+
+### Result — final score
+![Result](./img/result.png)
+
+### Ranking
+![Ranking](./img/ranking_page.png)
 
 ## Users Credentials
 

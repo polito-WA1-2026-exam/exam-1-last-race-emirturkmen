@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS line_stations (
     FOREIGN KEY (station_id) REFERENCES stations(id)
     );
 
-CREATE TABLE IF NOT EXISTS connections (
+CREATE TABLE IF NOT EXISTS segments (
                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
                                              line_id INTEGER NOT NULL,
                                              station1_id INTEGER NOT NULL,
@@ -54,9 +54,9 @@ CREATE TABLE IF NOT EXISTS games (
 CREATE TABLE IF NOT EXISTS game_segments (
                                              id INTEGER PRIMARY KEY AUTOINCREMENT,
                                              game_id INTEGER NOT NULL,
-                                             connection_id INTEGER NOT NULL,
+                                             segment_id INTEGER NOT NULL,
                                              order_index INTEGER NOT NULL,
                                              FOREIGN KEY (game_id) REFERENCES games(id),
-    FOREIGN KEY (connection_id) REFERENCES connections(id)
+    FOREIGN KEY (segment_id) REFERENCES segments(id)
     );
 
