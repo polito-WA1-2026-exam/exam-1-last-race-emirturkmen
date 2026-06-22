@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Container, Button, ListGroup, Badge, Alert, Form, Row, Col, ProgressBar, Card } from 'react-bootstrap'
 
-function Planning({ onNext }) {
-    const [segments, setSegments] = useState([])
-    const [gameInfo, setGameInfo] = useState(null)
+function Planning({ onNext, gameInfo, gameInfoError, segments }) {
     const [selectedSegments, setSelectedSegments] = useState([])
     const [timeLeft, setTimeLeft] = useState(90)
     const [search, setSearch] = useState('')
@@ -15,19 +13,10 @@ function Planning({ onNext }) {
     const submitRoute = () => onNext({ gameInfo, segments: selectedSegments })
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/game/new', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => setGameInfo(data))
-            .catch(() => setError(true))
-    }, [])
-
-    useEffect(() => {
-        fetch('http://localhost:3001/api/segments', { credentials: 'include' })
-            .then(res => res.json())
-            // shuffle once so the segments are not shown in a predictable order
-            .then(data => setSegments(data.sort(() => Math.random() - 0.5)))
-            .catch(() => setError(true))
-    }, [])
+        if (gameInfoError) {
+            setError(true)
+        }
+    }, [gameInfoError])
 
     // Count down one second at a time until the timer reaches 0
     useEffect(() => {

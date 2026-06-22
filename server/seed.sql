@@ -28,7 +28,7 @@ INSERT INTO lines (name) VALUES ('Ligne 4');  -- id: 4
 -- Ligne 1: La Défense(1) → Étoile(2) → Opéra(3) → Châtelet(4) → Bastille(5) → Vincennes(6)
 -- Ligne 2: Clignancourt(7) → Barbès(8) → Strasbourg(9) → Châtelet(4) → Montparnasse(10) → Montrouge(11)
 -- Ligne 3: Étoile(2) → Trocadéro(12) → Montparnasse(10) → Glacière(13) → Gare de Lyon(14) → Nation(15)
--- Ligne 4: Saint-Lazare(16) → Opéra(3) → Châtelet(4) → Gare de Lyon(14) → Tolbiac(17) → Olympiades(18)
+-- Ligne 4: Saint-Lazare(16) → Châtelet(4) → Gare de Lyon(14) → Tolbiac(17) → Olympiades(18)
 
 
 -- Ligne 1
@@ -57,11 +57,10 @@ INSERT INTO line_stations (line_id, station_id, position) VALUES (3, 15, 6);
 
 -- Ligne 4
 INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 16, 1);
-INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 3, 2);
-INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 4, 3);
-INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 14, 4);
-INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 17, 5);
-INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 18, 6);
+INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 4, 2);
+INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 14, 3);
+INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 17, 4);
+INSERT INTO line_stations (line_id, station_id, position) VALUES (4, 18, 5);
 
 -- SEGMENTS (komşu çiftler, her hat için)
 
@@ -87,8 +86,7 @@ INSERT INTO segments (line_id, station1_id, station2_id) VALUES (3, 13, 14);
 INSERT INTO segments (line_id, station1_id, station2_id) VALUES (3, 14, 15);
 
 -- Ligne 4
-INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 16, 3);
-INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 3, 4);
+INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 16, 4);
 INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 4, 14);
 INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 14, 17);
 INSERT INTO segments (line_id, station1_id, station2_id) VALUES (4, 17, 18);
@@ -109,9 +107,9 @@ INSERT INTO events (description, effect) VALUES ('Barrier malfunction, paid twic
 -- =====================
 -- USERS (3 username, bcrypt hash - password: "password123")
 -- =====================
-INSERT INTO users (username, password) VALUES ('alice', '$2b$10$KPRGVDVFgd4NwKRbWUBdPedBLhL/Hx8mIHGhzeU/6h/HdN46uEsJm');
-INSERT INTO users (username, password) VALUES ('bob', '$2b$10$KPRGVDVFgd4NwKRbWUBdPedBLhL/Hx8mIHGhzeU/6h/HdN46uEsJm');
-INSERT INTO users (username, password) VALUES ('charlie', '$2b$10$KPRGVDVFgd4NwKRbWUBdPedBLhL/Hx8mIHGhzeU/6h/HdN46uEsJm');
+INSERT INTO users (username, password) VALUES ('alice', '$2b$10$BbI6lz04nxmGLVnXO.qo5uCgqKGDSDVKK3RAriP.5wpxZ0yh94lty');
+INSERT INTO users (username, password) VALUES ('bob', '$2b$10$BbI6lz04nxmGLVnXO.qo5uCgqKGDSDVKK3RAriP.5wpxZ0yh94lty');
+INSERT INTO users (username, password) VALUES ('charlie', '$2b$10$BbI6lz04nxmGLVnXO.qo5uCgqKGDSDVKK3RAriP.5wpxZ0yh94lty');
 
 -- GAMES (alice and bob's games)
 -- =====================

@@ -1,34 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Container, Button, ListGroup, Badge, ProgressBar, Alert } from 'react-bootstrap';
 
-function Execution({ gameData, onFinish }) {
-    const [result, setResult] = useState(null)
+function Execution({ gameData, gameResult, executionError, onFinish }) {
     const [revealed, setRevealed] = useState(0)   // how many segments have been revealed so far
     const [error, setError] = useState(false)
+    const result = gameResult
 
     useEffect(() => {
-        if (!gameData) return
-        fetch('http://localhost:3001/api/games', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-                startId: gameData.gameInfo.start,
-                endId: gameData.gameInfo.end,
-                segments: gameData.segments.map(s => s.id)
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-                // Invalid routes have nothing to step through: go straight to the result screen.
-                if (!data.valid) {
-                    onFinish({ valid: false, score: 0 })
-                } else {
-                    setResult(data)
-                }
-            })
-            .catch(() => setError(true))
-    }, [])
+        if (executionError) {
+            setError(true)
+        }
+    }, [executionError])
 
     if (error) return (
         <Container className="mt-4" style={{ maxWidth: '700px' }}>

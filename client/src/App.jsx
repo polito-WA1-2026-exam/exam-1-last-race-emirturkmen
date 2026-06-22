@@ -7,7 +7,6 @@ import RankingPage from './pages/RankingPage'
 
 function App() {
   return (
-      // navbar padding in the top for all pages
       <>
           <NavigationBar />
           <div style={{paddingTop: '50px'}}>

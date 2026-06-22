@@ -161,8 +161,8 @@ app.get('/api/ranking', isLoggedIn, async (req, res) => {
 app.post('/api/games', isLoggedIn, async (req, res) => {
   const { startId, endId, segments } = req.body;
 
-  // Basic validation for invalid requests
-  if (!startId || !endId || !Array.isArray(segments) || segments.length === 0) {
+  // Basic validation for invalid requests (must exist and be arrays)
+  if (!startId || !endId || !Array.isArray(segments)) {
     return res.status(400).json({ error: 'Invalid request' });
   }
 
@@ -176,6 +176,11 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
       await gamesDAO.createGame(req.user.id, startId, endId, 0, false);
       return res.json({ score: 0, valid: false });
     };
+
+    // If route is empty, it is incomplete and invalid.
+    if (segments.length === 0) {
+      return markInvalid();
+    }
 
     // every requested segment id must resolve to a real segment
     if (routeSegments.some(s => !s)) {
