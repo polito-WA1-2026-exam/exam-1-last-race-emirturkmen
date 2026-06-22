@@ -12,6 +12,7 @@ export function AuthProvider({ children }) {
         fetch('http://localhost:3001/api/sessions/current', { credentials: 'include' })
             .then(res => res.ok ? res.json() : null)
             .then(data => setUser(data))
+            .catch(() => setUser(null))
             .finally(() => setLoading(false));
     }, []);
 

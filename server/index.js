@@ -158,7 +158,7 @@ app.get('/api/ranking', isLoggedIn, async (req, res) => {
   }
 });
 
-app.post('/api/games',  isLoggedIn,async (req, res) => {
+app.post('/api/games', isLoggedIn, async (req, res) => {
   const { startId, endId, segments } = req.body;
 
   // Basic validation for invalid requests
@@ -166,77 +166,81 @@ app.post('/api/games',  isLoggedIn,async (req, res) => {
     return res.status(400).json({ error: 'Invalid request' });
   }
 
-  const connections = await gamesDAO.getConnectionsByIds(segments);
-  const events = await eventsDAO.getEvents();
-  const lineStations = await networkDAO.getLineStations();
+  try {
+    const connections = await gamesDAO.getConnectionsByIds(segments);
+    const events = await eventsDAO.getEvents();
+    const lineStations = await networkDAO.getLineStations();
 
-  // helper to mark a route invalid: save a 0-score game and respond
-  const markInvalid = async () => {
-    await gamesDAO.createGame(req.user.id, startId, endId, 0, false);
-    return res.json({ score: 0, valid: false });
-  };
+    // helper to mark a route invalid: save a 0-score game and respond
+    const markInvalid = async () => {
+      await gamesDAO.createGame(req.user.id, startId, endId, 0, false);
+      return res.json({ score: 0, valid: false });
+    };
 
-  // every requested segment id must resolve to a real connection
-  if (connections.some(c => !c)) {
-    return markInvalid();
-  }
-
-  // Connections are undirected: a segment links station1_id and station2_id in either direction.
-  // We walk the path starting from startId; at each step the segment must touch the current
-  // station, and we move to its other endpoint. "exits" keeps the station we leave each segment at.
-  let current = startId;
-  const exits = [];
-  for (const conn of connections) {
-    let next;
-    if (conn.station1_id === current) {
-      next = conn.station2_id;
-    } else if (conn.station2_id === current) {
-      next = conn.station1_id;
-    } else {
-      // this segment is not connected to where we currently are -> broken path
+    // every requested segment id must resolve to a real connection
+    if (connections.some(c => !c)) {
       return markInvalid();
     }
-    exits.push(current); // the station we entered this segment from
-    current = next;
-  }
 
-  // after walking all segments we must end exactly at endId
-  if (current !== endId) {
-    return markInvalid();
-  }
-
-  // when two consecutive segments are on different lines, the station between them
-  // (the shared station) must be an interchange that belongs to both lines.
-  for (let i = 0; i < connections.length - 1; i++) {
-    const currConn = connections[i];
-    const nextConn = connections[i + 1];
-    if (currConn.line_id !== nextConn.line_id) {
-      // shared station = endpoint of currConn we arrived at = entry point of nextConn
-      const interchangeStation = exits[i + 1];
-      const onLine1 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === currConn.line_id);
-      const onLine2 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === nextConn.line_id);
-      if (!onLine1 || !onLine2) {
+    // Connections are undirected: a segment links station1_id and station2_id in either direction.
+    // We walk the path starting from startId; at each step the segment must touch the current
+    // station, and we move to its other endpoint. "exits" keeps the station we leave each segment at.
+    let current = startId;
+    const exits = [];
+    for (const conn of connections) {
+      let next;
+      if (conn.station1_id === current) {
+        next = conn.station2_id;
+      } else if (conn.station2_id === current) {
+        next = conn.station1_id;
+      } else {
+        // this segment is not connected to where we currently are -> broken path
         return markInvalid();
       }
+      exits.push(current); // the station we entered this segment from
+      current = next;
     }
-  }
 
-  // route is valid -> compute score with one random event per segment
-  let score = 20;
-  const chosenEvents = [];
-  for (let i = 0; i < connections.length; i++) {
-    const randomEvent = events[Math.floor(Math.random() * events.length)];
-    chosenEvents.push(randomEvent);
-    score += randomEvent.effect;
-  }
-  // if score < 0, it has to be 0 as score cannot be less than zero at the end.
-  score = Math.max(0, score);
+    // after walking all segments we must end exactly at endId
+    if (current !== endId) {
+      return markInvalid();
+    }
 
-  // save game to db
-  const gameId = await gamesDAO.createGame(req.user.id, startId, endId, score, true);
-  // save chosen segments in game to db
-  for (let i = 0; i < segments.length; i++) {
-    await gamesDAO.createGameSegment(gameId, segments[i], i);
+    // when two consecutive segments are on different lines, the station between them
+    // (the shared station) must be an interchange that belongs to both lines.
+    for (let i = 0; i < connections.length - 1; i++) {
+      const currConn = connections[i];
+      const nextConn = connections[i + 1];
+      if (currConn.line_id !== nextConn.line_id) {
+        // shared station = endpoint of currConn we arrived at = entry point of nextConn
+        const interchangeStation = exits[i + 1];
+        const onLine1 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === currConn.line_id);
+        const onLine2 = lineStations.some(ls => ls.station_id === interchangeStation && ls.line_id === nextConn.line_id);
+        if (!onLine1 || !onLine2) {
+          return markInvalid();
+        }
+      }
+    }
+
+    // route is valid -> compute score with one random event per segment
+    let score = 20;
+    const chosenEvents = [];
+    for (let i = 0; i < connections.length; i++) {
+      const randomEvent = events[Math.floor(Math.random() * events.length)];
+      chosenEvents.push(randomEvent);
+      score += randomEvent.effect;
+    }
+    // if score < 0, it has to be 0 as score cannot be less than zero at the end.
+    score = Math.max(0, score);
+
+    // save game to db
+    const gameId = await gamesDAO.createGame(req.user.id, startId, endId, score, true);
+    // save chosen segments in game to db
+    for (let i = 0; i < segments.length; i++) {
+      await gamesDAO.createGameSegment(gameId, segments[i], i);
+    }
+    return res.json({ finalScore: score, valid: true, events: chosenEvents });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  return res.json({ finalScore: score, valid: true, events: chosenEvents });
 });

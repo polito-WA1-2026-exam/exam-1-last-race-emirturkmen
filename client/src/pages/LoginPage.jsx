@@ -12,19 +12,23 @@ function LoginPage() {
 
     const submit = async (event) => {
         event.preventDefault();  // stop the browser from reloading the page on submit
-        const response = await fetch("http://localhost:3001/api/sessions", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            credentials: "include", // necessary for cookies
-            body: JSON.stringify({username, password})
-        });
+        try {
+            const response = await fetch("http://localhost:3001/api/sessions", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                credentials: "include", // necessary for cookies
+                body: JSON.stringify({username, password})
+            });
 
-        if(response.ok){
-            const data = await response.json()  // {id, username}
-            login(data)
-            navigate('/')
-        } else {
-            setError("Invalid username or password");
+            if (response.ok) {
+                const data = await response.json()  // {id, username}
+                login(data)
+                navigate('/')
+            } else {
+                setError("Invalid username or password");
+            }
+        } catch {
+            setError("Could not connect to the server. Please try again.");
         }
     };
 

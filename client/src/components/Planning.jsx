@@ -7,6 +7,7 @@ function Planning({ onNext }) {
     const [selectedSegments, setSelectedSegments] = useState([])
     const [timeLeft, setTimeLeft] = useState(90)
     const [search, setSearch] = useState('')
+    const [error, setError] = useState(false)
 
     // Submit the route built so far. Shared by the "Submit Route" button and by the
     // timeout below, so running out of time behaves exactly like pressing Submit.
@@ -17,6 +18,7 @@ function Planning({ onNext }) {
         fetch('http://localhost:3001/api/game/new', { credentials: 'include' })
             .then(res => res.json())
             .then(data => setGameInfo(data))
+            .catch(() => setError(true))
     }, [])
 
     useEffect(() => {
@@ -24,16 +26,18 @@ function Planning({ onNext }) {
             .then(res => res.json())
             // shuffle once so the segments are not shown in a predictable order
             .then(data => setConnections(data.sort(() => Math.random() - 0.5)))
+            .catch(() => setError(true))
     }, [])
 
+    // Count down one second at a time until the timer reaches 0
     useEffect(() => {
-        // When the 90 seconds run out, auto-submit the current route (as if Submit was pressed)
-        if (timeLeft === 0) {
-            submitRoute()
-            return
-        }
-        const timer = setTimeout(() => setTimeLeft(t => t - 1), 1000)
-        return () => clearTimeout(timer)
+        const id = setInterval(() => setTimeLeft(t => t - 1), 1000)
+        return () => clearInterval(id)
+    }, [])
+
+    // When the time is up, auto-submit the current route (as if Submit was pressed)
+    useEffect(() => {
+        if (timeLeft === 0) submitRoute()
     }, [timeLeft])
 
     // Current station (last reached stop): start from startId and walk through the
@@ -80,6 +84,7 @@ function Planning({ onNext }) {
 
     return (
         <Container className="mt-4" style={{ maxWidth: '1250px' }}>
+            {error && <Alert variant="danger">Could not load the game. Please refresh the page.</Alert>}
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h2 className="mb-0">Plan Your Route</h2>
                 <Badge
