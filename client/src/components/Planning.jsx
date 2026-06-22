@@ -8,6 +8,11 @@ function Planning({ onNext }) {
     const [timeLeft, setTimeLeft] = useState(90)
     const [search, setSearch] = useState('')
 
+    // Submit the route built so far. Shared by the "Submit Route" button and by the
+    // timeout below, so running out of time behaves exactly like pressing Submit.
+    // The server then decides: a complete valid route is scored, otherwise it is invalid.
+    const submitRoute = () => onNext({ gameInfo, segments: selectedSegments })
+
     useEffect(() => {
         fetch('http://localhost:3001/api/game/new', { credentials: 'include' })
             .then(res => res.json())
@@ -22,8 +27,9 @@ function Planning({ onNext }) {
     }, [])
 
     useEffect(() => {
+        // When the 90 seconds run out, auto-submit the current route (as if Submit was pressed)
         if (timeLeft === 0) {
-            onNext({ gameInfo, segments: selectedSegments })
+            submitRoute()
             return
         }
         const timer = setTimeout(() => setTimeLeft(t => t - 1), 1000)
@@ -205,7 +211,7 @@ function Planning({ onNext }) {
                         className="mt-3 w-100"
                         variant="success"
                         disabled={selectedSegments.length === 0}
-                        onClick={() => onNext({ gameInfo, segments: selectedSegments })}
+                        onClick={submitRoute}
                     >
                         Submit Route
                     </Button>
