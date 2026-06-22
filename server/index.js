@@ -90,16 +90,7 @@ app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
-app.get('/api/network', async (req, res) => {
-  try {
-    const lines = await networkDAO.getNetwork();
-    res.json(lines);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.get('/api/connections', async (req, res) => {
+app.get('/api/connections', isLoggedIn, async (req, res) => {
   try {
     const connections = await networkDAO.getConnections();
     res.json(connections);
@@ -153,15 +144,6 @@ app.get('/api/game/new', isLoggedIn, async (req, res) => {
       end: randomDestinationStationId,
       endName: endStation.name
     });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.get('/api/events', isLoggedIn, async (req, res) => {
-  try {
-    const events = await eventsDAO.getEvents();
-    res.json(events);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -10,21 +10,13 @@
 
 ## API Server
 
-* GET `/api/network`
-   * Request: none
-   * Response: array of lines with nested stations `[{ id, name, stations: [{id, name}] }]`
-
 * GET `/api/connections`
-   * Request: none
+   * Request: none (requires login)
    * Response: array of segments `[{ id, station1_id, station1_name, station2_id, station2_name, line_id, line_name }]`
 
 * GET `/api/game/new`
    * Request: none (requires login)
    * Response: randomly assigned start and destination stations (the destination is at least 3 stops away) `{ start: id, startName, end: id, endName }`
-
-* GET `/api/events`
-   * Request: none (requires login)
-   * Response: array of events `[{ id, description, effect }]`
 
 * POST `/api/games`
    * Request body: `{ startId, endId, segments: [connectionId, ...] }` (the ordered list of selected connection ids; requires login)

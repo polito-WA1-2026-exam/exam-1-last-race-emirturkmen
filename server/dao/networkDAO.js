@@ -1,33 +1,6 @@
 import db from '../db.js';
 
 const networkDAO = {
-  getNetwork: () => {
-    return new Promise((resolve, reject) => {
-      const sql = `
-        SELECT lines.id as line_id, lines.name as line_name,
-               stations.id as station_id, stations.name as station_name
-        FROM lines
-        JOIN line_stations ON lines.id = line_stations.line_id
-        JOIN stations ON stations.id = line_stations.station_id
-        ORDER BY lines.id, line_stations.position
-      `;
-      db.all(sql, (err, rows) => {
-        if (err) return reject(err);
-
-        const lines = [];
-        for (const row of rows) {
-          let line = lines.find(l => l.id === row.line_id);
-          if (!line) {
-            line = { id: row.line_id, name: row.line_name, stations: [] };
-            lines.push(line);
-          }
-          line.stations.push({ id: row.station_id, name: row.station_name });
-        }
-        resolve(lines);
-      });
-    });
-  },
-
   getConnections: () => {
     return new Promise((resolve, reject) => {
       const sql = `
